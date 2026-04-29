@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pablo Kasta — Flotando</title>
+<link href="https://fonts.googleapis.com/css2?family=Pragati+Narrow:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --cream: #f0ece4;
+    --warm-black: #0e0d0b;
+    --dust: #9e9488;
+    --accent: #c4a882;
+  }
+
+  html, body {
+    height: 100%;
+    background: var(--warm-black);
+    color: var(--cream);
+    font-family: 'Pragati Narrow', 'Arial Narrow', sans-serif;
+    overflow: hidden;
+    cursor: none;
+  }
+
+  /* Custom cursor */
+  .cursor {
+    position: fixed;
+    width: 6px;
+    height: 6px;
+    background: var(--cream);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    mix-blend-mode: difference;
+    transition: width 0.2s ease, height 0.2s ease;
+  }
+  .cursor.hovering {
+    width: 40px;
+    height: 40px;
+    background: transparent;
+    border: 1px solid var(--cream);
+  }
+
+  /* Grain */
+  .grain {
+    position: fixed;
+    inset: -50%;
+    width: 200%;
+    height: 200%;
+    pointer-events: none;
+    z-index: 100;
+    opacity: 0.04;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    animation: grain 0.4s steps(2) infinite;
+  }
+  @keyframes grain {
+    0%   { transform: translate(0,0); }
+    25%  { transform: translate(-1%,-2%); }
+    50%  { transform: translate(2%,1%); }
+    75%  { transform: translate(-2%,2%); }
+    100% { transform: translate(1%,-1%); }
+  }
+
+  /* HERO */
+  .hero {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  .hero-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+    filter: grayscale(15%) contrast(1.08) brightness(0.92);
+    opacity: 0;
+    animation: fadeImg 2.2s ease forwards 0.2s;
+  }
+  @keyframes fadeImg {
+    from { opacity: 0; transform: scale(1.04); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+
+  /* Gradient */
+  .hero-overlay {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(to bottom,
+        rgba(14,13,11,0.5) 0%,
+        rgba(14,13,11,0.0) 30%,
+        rgba(14,13,11,0.0) 50%,
+        rgba(14,13,11,0.7) 78%,
+        rgba(14,13,11,1.0) 100%
+      );
+    z-index: 1;
+  }
+
+  /* TOP BAR */
+  .top-bar {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    padding: 28px 5vw;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 3;
+    opacity: 0;
+    animation: fadeUp 1s ease forwards 0.8s;
+  }
+
+  .logo-img {
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+    filter: invert(1);
+    opacity: 0.85;
+  }
+
+  .social-links {
+    display: flex;
+    gap: 28px;
+  }
+  .social-link {
+    font-size: 9px;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--dust);
+    text-decoration: none;
+    font-weight: 400;
+    transition: color 0.25s ease;
+  }
+  .social-link:hover { color: var(--cream); }
+
+  /* BOTTOM CONTENT */
+  .hero-content {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    padding: 0 5vw 6vh;
+    z-index: 3;
+  }
+
+  .eyebrow {
+    font-size: 9px;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: var(--dust);
+    font-weight: 400;
+    margin-bottom: 14px;
+    opacity: 0;
+    animation: fadeUp 1s ease forwards 1.1s;
+  }
+
+  .title-block {
+    margin-bottom: 44px;
+    opacity: 0;
+    animation: fadeUp 1s ease forwards 1.3s;
+  }
+
+  .artist {
+    font-family: 'Pragati Narrow', 'Arial Narrow', sans-serif;
+    font-size: clamp(64px, 10vw, 130px);
+    font-weight: 700;
+    line-height: 0.9;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--cream);
+    display: block;
+  }
+
+  .release {
+    font-family: 'Pragati Narrow', 'Arial Narrow', sans-serif;
+    font-size: clamp(64px, 10vw, 130px);
+    font-weight: 400;
+    line-height: 0.9;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--accent);
+    display: block;
+  }
+
+  /* STREAM SECTION */
+  .stream-section {
+    opacity: 0;
+    animation: fadeUp 1s ease forwards 1.6s;
+  }
+
+  .stream-label {
+    font-size: 9px;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: var(--dust);
+    margin-bottom: 14px;
+    font-weight: 400;
+  }
+
+  .stream-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .stream-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 13px 24px;
+    border: 1px solid rgba(240,236,228,0.18);
+    background: rgba(240,236,228,0.03);
+    color: var(--cream);
+    text-decoration: none;
+    font-family: 'Pragati Narrow', 'Arial Narrow', sans-serif;
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-weight: 400;
+    transition: all 0.35s ease;
+    backdrop-filter: blur(12px);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .stream-btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(240,236,228,0.07);
+    transform: translateX(-100%);
+    transition: transform 0.4s ease;
+  }
+  .stream-btn:hover::after { transform: translateX(0); }
+  .stream-btn:hover { border-color: rgba(240,236,228,0.45); }
+
+  .stream-btn svg {
+    width: 15px;
+    height: 15px;
+    flex-shrink: 0;
+    opacity: 0.8;
+  }
+
+  /* VERTICAL TEXT */
+  .side-text {
+    position: absolute;
+    right: 5vw;
+    top: 50%;
+    transform: translateY(-50%) rotate(90deg);
+    transform-origin: center center;
+    font-size: 8px;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--dust);
+    white-space: nowrap;
+    z-index: 3;
+    opacity: 0;
+    animation: fadeIn 1s ease forwards 2.2s;
+  }
+
+  /* LINE ACCENT */
+  .line-accent {
+    position: absolute;
+    left: 5vw;
+    top: 50%;
+    width: 1px;
+    height: 0;
+    background: rgba(240,236,228,0.15);
+    z-index: 3;
+    animation: growLine 1.2s ease forwards 1.8s;
+  }
+  @keyframes growLine {
+    from { height: 0; }
+    to   { height: 80px; }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+
+  /* MOBILE */
+  @media (max-width: 600px) {
+    html, body { overflow-y: auto; }
+    .hero { height: 100svh; }
+    .side-text, .line-accent { display: none; }
+    .stream-buttons { flex-direction: column; }
+    .stream-btn { justify-content: center; }
+    .hero-content { padding: 0 6vw 8vh; }
+    .top-bar { padding: 22px 6vw; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="grain"></div>
+
+<section class="hero">
+
+  <img src="WhatsApp_Image_2026-04-23_at_18_29_10.jpeg" alt="Pablo Kasta" class="hero-img" />
+  <div class="hero-overlay"></div>
+
+  <!-- Top bar -->
+  <div class="top-bar">
+    <img src="Monochromatic_Logo.png" alt="Flaco Records" class="logo-img" />
+    <nav class="social-links">
+      <a href="https://www.instagram.com/pablokasta" class="social-link" target="_blank">Instagram</a>
+      <a href="https://www.tiktok.com/@pablokasta" class="social-link" target="_blank">TikTok</a>
+    </nav>
+  </div>
+
+  <!-- Side accent -->
+  <div class="line-accent"></div>
+  <div class="side-text">Nuevo sencillo</div>
+
+  <!-- Main content -->
+  <div class="hero-content">
+    <div class="title-block">
+      <span class="eyebrow" style="display:block; margin-bottom:10px;">Pablo Kasta</span>
+      <span class="artist">Flotando</span>
+    </div>
+
+    <div class="stream-section">
+      <p class="stream-label">Escuchar ahora</p>
+      <div class="stream-buttons">
+
+        <!-- Spotify -->
+        <a href="https://open.spotify.com/artist/4e21Yjg54JDW7UAIqTFrfj?si=22499cddfb0c4b84" class="stream-btn" target="_blank">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
+          </svg>
+          Spotify
+        </a>
+
+        <!-- Apple Music -->
+        <a href="https://music.apple.com/co/artist/pablo-kasta/1745171470?l=en-GB" class="stream-btn" target="_blank">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M23.994 6.124a9.23 9.23 0 00-.24-2.19c-.317-1.31-1.062-2.31-2.18-3.043a5.022 5.022 0 00-1.877-.726 10.496 10.496 0 00-1.564-.15c-.04-.003-.083-.01-.124-.013H5.986c-.152.01-.303.017-.455.026C4.786.07 4.043.15 3.34.428 2.067.93 1.157 1.802.604 3.076A6.[ 6.[ 6.[ 6.[ 6.[963 6.963 0 00.08 4.9 8.896 8.896 0 000 5.91v12.178c.016.463.05.923.14 1.38.246 1.27.943 2.278 1.943 3.034a5.244 5.244 0 002.07.83c.535.097 1.078.137 1.62.15.044.004.09.007.132.01h12.033c.463-.016.924-.05 1.382-.14 1.27-.246 2.278-.944 3.035-1.943a5.26 5.26 0 00.83-2.07c.097-.535.137-1.078.15-1.62.004-.044.007-.09.01-.133V6.5c-.003-.125-.007-.25-.013-.375zm-6.9 3.99l-4.98 8.013a1.06 1.06 0 01-1.458.351 1.06 1.06 0 01-.351-1.458l1.84-2.96-3.476-.695a1.06 1.06 0 01-.825-1.244 1.06 1.06 0 011.244-.825l4.98.996a1.06 1.06 0 01.684 1.562l-.66 1.063 1.34-2.157a1.06 1.06 0 011.458-.35 1.06 1.06 0 01.204 1.704z"/>
+          </svg>
+          Apple Music
+        </a>
+
+        <!-- YouTube Music -->
+        <a href="https://music.youtube.com/search?q=pablo+kasta" class="stream-btn" target="_blank">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 0C5.376 0 0 5.376 0 12s5.376 12 12 12 12-5.376 12-12S18.624 0 12 0zm0 19.104c-3.924 0-7.104-3.18-7.104-7.104S8.076 4.896 12 4.896s7.104 3.18 7.104 7.104-3.18 7.104-7.104 7.104zm0-13.332c-3.432 0-6.228 2.796-6.228 6.228S8.568 18.228 12 18.228s6.228-2.796 6.228-6.228S15.432 5.772 12 5.772zM9.684 15.54V8.46L15.816 12l-6.132 3.54z"/>
+          </svg>
+          YouTube Music
+        </a>
+
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<script>
+  // Cursor
+  const cursor = document.getElementById('cursor');
+  document.addEventListener('mousemove', e => {
+    cursor.style.left = e.clientX + 'px';
+    cursor.style.top = e.clientY + 'px';
+  });
+  document.querySelectorAll('a').forEach(el => {
+    el.addEventListener('mouseenter', () => cursor.classList.add('hovering'));
+    el.addEventListener('mouseleave', () => cursor.classList.remove('hovering'));
+  });
+</script>
+
+</body>
+</html>
